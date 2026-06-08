@@ -66,6 +66,9 @@ document.addEventListener('DOMContentLoaded', () => {
         exportBtn.innerHTML = "正在生成图片...";
         exportBtn.disabled = true;
 
+        // 增加 exporting 类，强制关闭所有卡片动画，确保 html2canvas 截屏元素是最终形态
+        captureArea.classList.add('exporting');
+
         try {
             // 使用 html2canvas 截取 captureArea 区域
             const canvas = await html2canvas(captureArea, {
@@ -84,6 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error("导出图片失败:", err);
             alert("导出图片失败，请稍后再试。");
         } finally {
+            captureArea.classList.remove('exporting');
             exportBtn.innerHTML = originalText;
             exportBtn.disabled = false;
         }

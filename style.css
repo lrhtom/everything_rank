@@ -386,10 +386,23 @@ input[type="range"]::-webkit-slider-thumb:hover {
     font-size: 2rem;
     font-weight: 800;
     margin-bottom: 2rem;
-    background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.3));
+    color: #e2e8f0;
+    text-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
+}
+
+/* 修复 html2canvas 下文字颜色不继承发黑的问题 */
+.capture-area, .rank-title, .rank-reason {
+    color: var(--text-main);
+}
+.rank-reason {
+    color: var(--text-muted);
+}
+
+/* 导出时强制关闭动画并显示完全，避免 html2canvas 截取到半透明或位移状态 */
+.exporting .rank-card {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
 }
 
 .action-buttons {
