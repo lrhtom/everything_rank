@@ -58,12 +58,13 @@ document.addEventListener('DOMContentLoaded', () => {
         // 构建严格返回 JSON 的 Prompt
         const prompt = `You are an expert ranking assistant. The user wants a top ${count} ranking for the topic: "${topic}".
 You must provide the most reasonable, objective, and widely accepted ranking.
+**CRITICAL**: You must respond in Chinese language (简体中文) for all text fields.
 Respond strictly in JSON format. The root must be a JSON array. 
 Each object in the array must have exactly the following keys:
 - "rank": integer (from 1 to ${count})
-- "name": string (the name of the item)
-- "score": string (an optional metric or score representing its value, e.g., "9.8/10", "SS tier", "98 points")
-- "reason": string (a short, engaging 1-2 sentence explanation of why it earned this rank)
+- "name": string (the name of the item in Chinese)
+- "score": string (an optional metric or score representing its value, e.g., "9.8/10", "SS级", "98分")
+- "reason": string (a short, engaging 1-2 sentence explanation in Chinese of why it earned this rank)
 
 Do NOT wrap the JSON in markdown code blocks like \`\`\`json. Just output the raw JSON array.`;
 
