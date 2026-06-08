@@ -96,7 +96,8 @@ document.addEventListener('DOMContentLoaded', () => {
     async function fetchRanking(topic, count) {
         // 构建严格返回 JSON 的 Prompt
         const prompt = `You are an expert ranking assistant. The user wants a top ${count} ranking for the topic: "${topic}".
-You must provide the most reasonable, objective, and widely accepted ranking.
+**IMPORTANT**: Please search the internet first to find the most accurate, up-to-date, and authoritative ranking data for this topic. If and only if you cannot find relevant search results, then fall back to using your own internal knowledge to generate the ranking.
+You must provide the most reasonable, objective, and widely accepted ranking based on your findings.
 **CRITICAL**: You must respond in Chinese language (简体中文) for all text fields.
 Respond strictly in JSON format. The root must be a JSON array. 
 Each object in the array must have exactly the following keys:
