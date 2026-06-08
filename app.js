@@ -1,6 +1,6 @@
-const GEMINI_API_KEY = "AIzaSyAjf2LnboJ7yKEtTduAqtzJnAHRJWLI7CI";
-const GEMINI_MODEL = "gemini-3-flash-preview";
-const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
+const AI_API_KEY = "sk-e01f84fe67424e5dbebce5b3b4f8d095";
+const AI_MODEL = "deepseek-v4-flash";
+const API_URL = "https://api.deepseek.com/chat/completions";
 
 document.addEventListener('DOMContentLoaded', () => {
     const topicInput = document.getElementById('topicInput');
@@ -66,19 +66,20 @@ Each object in the array must have exactly the following keys:
 Do NOT wrap the JSON in markdown code blocks like \`\`\`json. Just output the raw JSON array.`;
 
         const requestBody = {
-            contents: [{
-                parts: [{ text: prompt }]
-            }],
-            generationConfig: {
-                temperature: 0.7,
-                responseMimeType: "application/json"
-            }
+            model: AI_MODEL,
+            messages: [
+                { role: "system", content: "You are a helpful assistant." },
+                { role: "user", content: prompt }
+            ],
+            temperature: 0.7,
+            response_format: { type: "json_object" }
         };
 
         const response = await fetch(API_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${AI_API_KEY}`
             },
             body: JSON.stringify(requestBody)
         });
@@ -91,7 +92,11 @@ Do NOT wrap the JSON in markdown code blocks like \`\`\`json. Just output the ra
         const data = await response.json();
         
         // 解析返回的 JSON 字符串
-        const textContent = data.candidates[0].content.parts[0].text;
+        let textContent = data.choices[0].message.content;
+        
+        // 尝试去除可能的 markdown 代码块标记，以防万一
+        textContent = textContent.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+
         try {
             return JSON.parse(textContent);
         } catch (e) {
