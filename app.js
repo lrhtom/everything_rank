@@ -130,7 +130,7 @@ Do NOT wrap the JSON in markdown code blocks like \`\`\`json. Just output the ra
                 <div class="rank-number">#${item.rank}</div>
                 <div class="rank-content">
                     <h3 class="rank-title">${item.name}</h3>
-                    ${item.score ? \`<div class="rank-score">\${item.score}</div>\` : ''}
+                    ${item.score ? `<div class="rank-score">${item.score}</div>` : ''}
                     <p class="rank-reason">${item.reason}</p>
                 </div>
             `;
