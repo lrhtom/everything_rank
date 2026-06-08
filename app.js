@@ -1,5 +1,5 @@
 const AI_API_KEY = "sk-e01f84fe67424e5dbebce5b3b4f8d095";
-const AI_MODEL = "deepseek-v4-flash";
+const AI_MODEL = "deepseek-v4-pro";
 const API_URL = "https://api.deepseek.com/chat/completions";
 
 document.addEventListener('DOMContentLoaded', () => {
