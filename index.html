@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Everything Rank - AI 智能排名</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="background-effect"></div>
+    
+    <main class="container">
+        <header>
+            <h1 class="glow-text">Everything Rank</h1>
+            <p class="subtitle">输入任意主题，AI 为你生成最合理的排行榜</p>
+        </header>
+
+        <section class="input-section glass-panel">
+            <div class="form-group">
+                <label for="topicInput">你想排名什么？</label>
+                <input type="text" id="topicInput" placeholder="例如：高考数学难度、最好玩的开放世界游戏..." autocomplete="off">
+            </div>
+            
+            <div class="form-group">
+                <label for="countInput">数量限制 (1-20)</label>
+                <div class="range-container">
+                    <input type="range" id="countInput" min="1" max="20" value="10">
+                    <span id="countValue" class="count-badge">10</span>
+                </div>
+            </div>
+
+            <button id="generateBtn" class="primary-btn">
+                <span class="btn-text">生成排名</span>
+                <span class="loader hidden"></span>
+            </button>
+        </section>
+
+        <section id="resultSection" class="result-section hidden">
+            <!-- 排名卡片将被动态插入这里 -->
+        </section>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>

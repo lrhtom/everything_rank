@@ -1,0 +1,134 @@
+const GEMINI_API_KEY = "AIzaSyAjf2LnboJ7yKEtTduAqtzJnAHRJWLI7CI";
+const GEMINI_MODEL = "gemini-3-flash-preview";
+const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
+
+document.addEventListener('DOMContentLoaded', () => {
+    const topicInput = document.getElementById('topicInput');
+    const countInput = document.getElementById('countInput');
+    const countValue = document.getElementById('countValue');
+    const generateBtn = document.getElementById('generateBtn');
+    const btnText = generateBtn.querySelector('.btn-text');
+    const loader = generateBtn.querySelector('.loader');
+    const resultSection = document.getElementById('resultSection');
+
+    // 监听数量变化并实时更新数字徽章
+    countInput.addEventListener('input', (e) => {
+        countValue.textContent = e.target.value;
+    });
+
+    generateBtn.addEventListener('click', async () => {
+        const topic = topicInput.value.trim();
+        const count = countInput.value;
+
+        if (!topic) {
+            alert("请输入你想排名的主题！");
+            topicInput.focus();
+            return;
+        }
+
+        // 设置加载状态
+        generateBtn.disabled = true;
+        btnText.classList.add('hidden');
+        loader.classList.remove('hidden');
+        resultSection.innerHTML = '';
+        resultSection.classList.remove('hidden');
+
+        try {
+            const results = await fetchRanking(topic, count);
+            renderResults(results);
+        } catch (error) {
+            console.error("Fetch Error:", error);
+            resultSection.innerHTML = `
+                <div class="error-message">
+                    <h3>生成失败</h3>
+                    <p>${error.message || "未知错误，请检查网络或稍后再试。"}</p>
+                </div>
+            `;
+        } finally {
+            // 恢复按钮状态
+            generateBtn.disabled = false;
+            btnText.classList.remove('hidden');
+            loader.classList.add('hidden');
+        }
+    });
+
+    async function fetchRanking(topic, count) {
+        // 构建严格返回 JSON 的 Prompt
+        const prompt = `You are an expert ranking assistant. The user wants a top ${count} ranking for the topic: "${topic}".
+You must provide the most reasonable, objective, and widely accepted ranking.
+Respond strictly in JSON format. The root must be a JSON array. 
+Each object in the array must have exactly the following keys:
+- "rank": integer (from 1 to ${count})
+- "name": string (the name of the item)
+- "score": string (an optional metric or score representing its value, e.g., "9.8/10", "SS tier", "98 points")
+- "reason": string (a short, engaging 1-2 sentence explanation of why it earned this rank)
+
+Do NOT wrap the JSON in markdown code blocks like \`\`\`json. Just output the raw JSON array.`;
+
+        const requestBody = {
+            contents: [{
+                parts: [{ text: prompt }]
+            }],
+            generationConfig: {
+                temperature: 0.7,
+                responseMimeType: "application/json"
+            }
+        };
+
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestBody)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(`API Error: ${response.status} ${errorData.error?.message || ''}`);
+        }
+
+        const data = await response.json();
+        
+        // 解析返回的 JSON 字符串
+        const textContent = data.candidates[0].content.parts[0].text;
+        try {
+            return JSON.parse(textContent);
+        } catch (e) {
+            throw new Error("AI 返回了无法解析的内容，请重试。");
+        }
+    }
+
+    function renderResults(results) {
+        resultSection.innerHTML = '';
+        
+        if (!Array.isArray(results) || results.length === 0) {
+            resultSection.innerHTML = '<div class="error-message">未能获取到有效的排名数据。</div>';
+            return;
+        }
+
+        // 确保按照排名排序
+        results.sort((a, b) => a.rank - b.rank);
+
+        results.forEach((item, index) => {
+            // 错开动画延迟，实现瀑布流渐现效果
+            const delay = index * 0.1; 
+            
+            const card = document.createElement('div');
+            card.className = 'rank-card';
+            card.setAttribute('data-rank', item.rank);
+            card.style.animationDelay = `${delay}s`;
+
+            card.innerHTML = `
+                <div class="rank-number">#${item.rank}</div>
+                <div class="rank-content">
+                    <h3 class="rank-title">${item.name}</h3>
+                    ${item.score ? \`<div class="rank-score">\${item.score}</div>\` : ''}
+                    <p class="rank-reason">${item.reason}</p>
+                </div>
+            `;
+            
+            resultSection.appendChild(card);
+        });
+    }
+});
