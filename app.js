@@ -26,16 +26,18 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        const loadingOverlay = document.getElementById('loadingOverlay');
+
         // 设置加载状态
         generateBtn.disabled = true;
-        btnText.classList.add('hidden');
-        loader.classList.remove('hidden');
+        loadingOverlay.classList.remove('hidden'); // 显示全屏加载
         resultSection.innerHTML = '';
-        resultSection.classList.remove('hidden');
+        resultSection.classList.add('hidden'); // 隐藏旧结果
 
         try {
             const results = await fetchRanking(topic, count);
             renderResults(results);
+            resultSection.classList.remove('hidden'); // 渲染完成后显示
         } catch (error) {
             console.error("Fetch Error:", error);
             resultSection.innerHTML = `
@@ -44,11 +46,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     <p>${error.message || "未知错误，请检查网络或稍后再试。"}</p>
                 </div>
             `;
+            resultSection.classList.remove('hidden');
         } finally {
             // 恢复按钮状态
             generateBtn.disabled = false;
-            btnText.classList.remove('hidden');
-            loader.classList.add('hidden');
+            loadingOverlay.classList.add('hidden'); // 隐藏全屏加载
         }
     });
 
