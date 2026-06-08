@@ -36,9 +36,20 @@
             </button>
         </section>
 
-        <section id="resultSection" class="result-section hidden">
-            <!-- 排名卡片将被动态插入这里 -->
-        </section>
+        <div id="exportWrapper" class="export-wrapper hidden">
+            <div id="captureArea" class="capture-area">
+                <h2 id="rankingTitle" class="ranking-title"></h2>
+                <section id="resultSection" class="result-section">
+                    <!-- 排名卡片将被动态插入这里 -->
+                </section>
+            </div>
+            <div class="action-buttons">
+                <button id="exportBtn" class="secondary-btn">
+                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;vertical-align:middle;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    保存为图片
+                </button>
+            </div>
+        </div>
     </main>
 
     <!-- 全屏加载动画遮罩 -->
@@ -49,6 +60,8 @@
         </div>
     </div>
 
+    <!-- html2canvas 用于将网页导出为图片 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="app.js"></script>
 </body>
 </html>

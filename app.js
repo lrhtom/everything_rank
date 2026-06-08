@@ -10,6 +10,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnText = generateBtn.querySelector('.btn-text');
     const loader = generateBtn.querySelector('.loader');
     const resultSection = document.getElementById('resultSection');
+    const exportWrapper = document.getElementById('exportWrapper');
+    const rankingTitle = document.getElementById('rankingTitle');
+    const exportBtn = document.getElementById('exportBtn');
+    const captureArea = document.getElementById('captureArea');
 
     // 监听数量变化并实时更新数字徽章
     countInput.addEventListener('input', (e) => {
@@ -32,25 +36,56 @@ document.addEventListener('DOMContentLoaded', () => {
         generateBtn.disabled = true;
         loadingOverlay.classList.remove('hidden'); // 显示全屏加载
         resultSection.innerHTML = '';
-        resultSection.classList.add('hidden'); // 隐藏旧结果
+        exportWrapper.classList.add('hidden'); // 隐藏旧结果包装器
 
         try {
             const results = await fetchRanking(topic, count);
+            rankingTitle.textContent = `关于“${topic}”的 Top ${count} 排名`;
+            exportBtn.style.display = 'inline-flex'; // 成功时显示导出按钮
             renderResults(results);
-            resultSection.classList.remove('hidden'); // 渲染完成后显示
+            exportWrapper.classList.remove('hidden'); // 渲染完成后显示
         } catch (error) {
             console.error("Fetch Error:", error);
+            rankingTitle.textContent = "生成失败";
+            exportBtn.style.display = 'none'; // 失败时隐藏导出按钮
             resultSection.innerHTML = `
                 <div class="error-message">
-                    <h3>生成失败</h3>
                     <p>${error.message || "未知错误，请检查网络或稍后再试。"}</p>
                 </div>
             `;
-            resultSection.classList.remove('hidden');
+            exportWrapper.classList.remove('hidden');
         } finally {
             // 恢复按钮状态
             generateBtn.disabled = false;
             loadingOverlay.classList.add('hidden'); // 隐藏全屏加载
+        }
+    });
+
+    exportBtn.addEventListener('click', async () => {
+        const originalText = exportBtn.innerHTML;
+        exportBtn.innerHTML = "正在生成图片...";
+        exportBtn.disabled = true;
+
+        try {
+            // 使用 html2canvas 截取 captureArea 区域
+            const canvas = await html2canvas(captureArea, {
+                backgroundColor: "#0f172a", // 强制深色背景以避免透明发白
+                scale: 2 // 提高清晰度
+            });
+            const imgData = canvas.toDataURL('image/png');
+            
+            // 触发下载
+            const link = document.createElement('a');
+            const safeTopic = topicInput.value.trim().replace(/[\/\\?%*:|"<>]/g, '-');
+            link.download = `${safeTopic}_排名.png`;
+            link.href = imgData;
+            link.click();
+        } catch (err) {
+            console.error("导出图片失败:", err);
+            alert("导出图片失败，请稍后再试。");
+        } finally {
+            exportBtn.innerHTML = originalText;
+            exportBtn.disabled = false;
         }
     });
 
