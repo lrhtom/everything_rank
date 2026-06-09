@@ -1,7 +1,3 @@
-const AI_API_KEY = "sk-e01f84fe67424e5dbebce5b3b4f8d095";
-const AI_MODEL = "deepseek-v4-pro";
-const API_URL = "https://api.deepseek.com/chat/completions";
-
 document.addEventListener('DOMContentLoaded', () => {
     const topicInput = document.getElementById('topicInput');
     const countInput = document.getElementById('countInput');
@@ -14,6 +10,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const rankingTitle = document.getElementById('rankingTitle');
     const exportBtn = document.getElementById('exportBtn');
     const captureArea = document.getElementById('captureArea');
+
+    // API Config
+    const apiUrlInput = document.getElementById('apiUrlInput');
+    const apiKeyInput = document.getElementById('apiKeyInput');
+    const apiModelInput = document.getElementById('apiModelInput');
+    const saveConfigBtn = document.getElementById('saveConfigBtn');
+
+    apiUrlInput.value = localStorage.getItem('ER_API_URL') || '';
+    apiKeyInput.value = localStorage.getItem('ER_API_KEY') || '';
+    apiModelInput.value = localStorage.getItem('ER_API_MODEL') || '';
+
+    saveConfigBtn.addEventListener('click', () => {
+        localStorage.setItem('ER_API_URL', apiUrlInput.value.trim());
+        localStorage.setItem('ER_API_KEY', apiKeyInput.value.trim());
+        localStorage.setItem('ER_API_MODEL', apiModelInput.value.trim());
+        alert("API 配置已成功保存到本地浏览器！");
+    });
 
     // 监听数量变化并实时更新数字徽章
     countInput.addEventListener('input', (e) => {
@@ -30,6 +43,15 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        const apiUrl = localStorage.getItem('ER_API_URL');
+        const apiKey = localStorage.getItem('ER_API_KEY');
+        const apiModel = localStorage.getItem('ER_API_MODEL');
+
+        if (!apiUrl || !apiKey || !apiModel) {
+            alert("请先展开上方『⚙️ API 自定义配置』并填写完整的 API 信息后保存！");
+            return;
+        }
+
         const loadingOverlay = document.getElementById('loadingOverlay');
 
         // 设置加载状态
@@ -39,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
         exportWrapper.classList.add('hidden'); // 隐藏旧结果包装器
 
         try {
-            const results = await fetchRanking(topic, count);
+            const results = await fetchRanking(topic, count, apiUrl, apiKey, apiModel);
             rankingTitle.textContent = `关于“${topic}”的 Top ${count} 排名`;
             exportBtn.style.display = 'inline-flex'; // 成功时显示导出按钮
             renderResults(results);
@@ -93,7 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    async function fetchRanking(topic, count) {
+    async function fetchRanking(topic, count, apiUrl, apiKey, apiModel) {
         // 构建严格返回 JSON 的 Prompt
         const prompt = `You are an expert ranking assistant. The user wants a top ${count} ranking for the topic: "${topic}".
 **IMPORTANT**: Please search the internet first to find the most accurate, up-to-date, and authoritative ranking data for this topic. If and only if you cannot find relevant search results, then fall back to using your own internal knowledge to generate the ranking.
@@ -109,7 +131,7 @@ Each object in the array must have exactly the following keys:
 Do NOT wrap the JSON in markdown code blocks like \`\`\`json. Just output the raw JSON array.`;
 
         const requestBody = {
-            model: AI_MODEL,
+            model: apiModel,
             messages: [
                 { role: "system", content: "You are a helpful assistant." },
                 { role: "user", content: prompt }
@@ -118,11 +140,11 @@ Do NOT wrap the JSON in markdown code blocks like \`\`\`json. Just output the ra
             response_format: { type: "json_object" }
         };
 
-        const response = await fetch(API_URL, {
+        const response = await fetch(apiUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${AI_API_KEY}`
+                'Authorization': `Bearer ${apiKey}`
             },
             body: JSON.stringify(requestBody)
         });

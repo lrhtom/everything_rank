@@ -16,6 +16,29 @@
             <p class="subtitle">输入任意主题，AI 为你生成排行榜（结果仅供娱乐）</p>
         </header>
 
+        <section class="config-section glass-panel">
+            <details>
+                <summary>⚙️ API 自定义配置 (初次使用请先配置)</summary>
+                <div class="config-content">
+                    <div class="form-group">
+                        <label for="apiUrlInput">API Base URL</label>
+                        <input type="text" id="apiUrlInput" placeholder="例如：https://api.deepseek.com/chat/completions" autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label for="apiKeyInput">API Key</label>
+                        <input type="password" id="apiKeyInput" placeholder="你的 API Key (sk-...)">
+                    </div>
+                    <div class="form-group">
+                        <label for="apiModelInput">模型名称</label>
+                        <input type="text" id="apiModelInput" placeholder="例如：deepseek-v4-flash" autocomplete="off">
+                    </div>
+                    <div class="action-buttons" style="margin-bottom: 0;">
+                        <button id="saveConfigBtn" class="secondary-btn">保存配置到本地</button>
+                    </div>
+                </div>
+            </details>
+        </section>
+
         <section class="input-section glass-panel">
             <div class="form-group">
                 <label for="topicInput">你想排名什么？</label>
